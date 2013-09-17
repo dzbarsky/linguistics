@@ -2,6 +2,7 @@
 # Yaou Wang: yaouwang@wharton.upenn.edu
 
 from nltk.corpus import PlaintextCorpusReader
+from nltk.tokenize import sent_tokenize
 
 Corpus_root = 'corpus'
 Mixed_root = 'mixed'
@@ -22,9 +23,16 @@ def get_all_files(directory):
         files.extend(get_all_files(directory + "/" + subdir))
     return files
 
+def load_file_sentences(file):
+    index = file.rfind('/')
+    dir = file[0:index]
+    file = file[index + 1:]
+    return sent_tokenize(PlaintextCorpusReader(dir, file).raw().lower())
+
 def main():
     print get_sub_directories(Corpus_root)
     print get_all_files(Starbucks_root)
+    print load_file_sentences(Starbucks_root + '/118990300.txt')
 
 if __name__ == "__main__":
     main()
