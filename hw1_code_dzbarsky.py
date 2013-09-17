@@ -3,6 +3,7 @@
 
 from nltk.corpus import PlaintextCorpusReader
 from nltk.tokenize import sent_tokenize, word_tokenize
+import math
 
 Corpus_root = 'corpus'
 Mixed_root = 'mixed'
@@ -18,11 +19,7 @@ def get_sub_directories(directory):
     return list(subdirs)
 
 def get_all_files(directory):
-    files = []
-    files.extend(PlaintextCorpusReader(directory, '.*').fileids())
-    for subdir in get_sub_directories(directory):
-        files.extend(get_all_files(directory + "/" + subdir))
-    return files
+    return PlaintextCorpusReader(directory, '.*').fileids()
 
 def load_file_sentences(filepath):
     index = filepath.rfind('/')
@@ -65,12 +62,14 @@ def get_tf(path):
     return map
 
 def get_idf(directory):
-    docs = []
+    docs = list()
     files = get_all_files(directory)
     for file in files:
         docs.append(load_file_tokens(directory + '/' + file))
+    print "DONE LOADING"
     map = dict()
     for doc in docs:
+        print doc
         for token in doc:
             if token in map:
                 continue
@@ -79,10 +78,37 @@ def get_idf(directory):
                 if token in doc2:
                     occurences += 1
             map[token] = occurences
-            
+
     for token in map.keys():
-        map[token] = Math.log(len(files)/map[token])
+        map[token] = math.log(len(files)/map[token])
+
     return map
+
+def get_tf_idf(dict1, dict2, k):
+    tuples = []
+    for term in dict1:
+        tuples.append((term, dict1[term] * dict2[term]))
+
+    tuples.sort(key=lambda x: x[1], reverse=True)
+
+    terms = []
+    for item in tuples[0:k]:
+        terms.append(item[0])
+    return terms
+
+def main():
+    #print get_sub_directories(Corpus_root)
+    #print get_all_files(Starbucks_root)
+    #print load_file_sentences(Starbucks_root + '/118990300.txt')
+    #print load_collection_sentences(Starbucks_root)
+    #print load_file_tokens(Starbucks_root + '/118990300.txt')
+    #print load_collection_tokens(Starbucks_root)
+    dict1 = get_tf(Heinz_root)
+    print dict1
+    dict2 = get_idf(Corpus_root)
+    print dict2
+    print get_tf_idf(dict1, dict2, 10)
+
 
 if __name__ == "__main__":
     main()
