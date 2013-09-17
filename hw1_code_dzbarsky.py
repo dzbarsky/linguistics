@@ -2,7 +2,7 @@
 # Yaou Wang: yaouwang@wharton.upenn.edu
 
 from nltk.corpus import PlaintextCorpusReader
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 
 Corpus_root = 'corpus'
 Mixed_root = 'mixed'
@@ -23,11 +23,11 @@ def get_all_files(directory):
         files.extend(get_all_files(directory + "/" + subdir))
     return files
 
-def load_file_sentences(file):
-    index = file.rfind('/')
-    dir = file[0:index]
-    file = file[index + 1:]
-    return sent_tokenize(PlaintextCorpusReader(dir, file).raw().lower())
+def load_file_sentences(filepath):
+    index = filepath.rfind('/')
+    dir = filepath[0:index]
+    filepath = filepath[index + 1:]
+    return sent_tokenize(PlaintextCorpusReader(dir, filepath).raw().lower())
 
 def load_collection_sentences(directory):
     sentences = []
@@ -35,11 +35,25 @@ def load_collection_sentences(directory):
         sentences.extend(load_file_sentences(directory + '/' + file))
     return sentences
 
+def load_file_tokens(filepath):
+    tokens = []
+    for sentence in load_file_sentences(filepath):
+        tokens.extend(word_tokenize(sentence))
+    return tokens
+
+def load_collection_tokens(directory):
+    tokens = []
+    for file in get_all_files(directory):
+        tokens.extend(load_file_tokens(directory + '/' + file))
+    return tokens
+
 def main():
     print get_sub_directories(Corpus_root)
     print get_all_files(Starbucks_root)
     print load_file_sentences(Starbucks_root + '/118990300.txt')
     print load_collection_sentences(Starbucks_root)
+    print load_file_tokens(Starbucks_root + '/118990300.txt')
+    print load_collection_tokens(Starbucks_root)
 
 if __name__ == "__main__":
     main()
