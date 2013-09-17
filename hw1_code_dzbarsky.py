@@ -64,14 +64,25 @@ def get_tf(path):
         map[token] /= float(len(tokens))
     return map
 
-def main():
-    print get_sub_directories(Corpus_root)
-    print get_all_files(Starbucks_root)
-    print load_file_sentences(Starbucks_root + '/118990300.txt')
-    print load_collection_sentences(Starbucks_root)
-    print load_file_tokens(Starbucks_root + '/118990300.txt')
-    print load_collection_tokens(Starbucks_root)
-    print get_tf(Heinz_root)
+def get_idf(directory):
+    docs = []
+    files = get_all_files(directory)
+    for file in files:
+        docs.append(load_file_tokens(directory + '/' + file))
+    map = dict()
+    for doc in docs:
+        for token in doc:
+            if token in map:
+                continue
+            occurences = 0
+            for doc2 in docs:
+                if token in doc2:
+                    occurences += 1
+            map[token] = occurences
+            
+    for token in map.keys():
+        map[token] = Math.log(len(files)/map[token])
+    return map
 
 if __name__ == "__main__":
     main()
