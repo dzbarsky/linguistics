@@ -29,10 +29,17 @@ def load_file_sentences(file):
     file = file[index + 1:]
     return sent_tokenize(PlaintextCorpusReader(dir, file).raw().lower())
 
+def load_collection_sentences(directory):
+    sentences = []
+    for file in get_all_files(directory):
+        sentences.extend(load_file_sentences(directory + '/' + file))
+    return sentences
+
 def main():
     print get_sub_directories(Corpus_root)
     print get_all_files(Starbucks_root)
     print load_file_sentences(Starbucks_root + '/118990300.txt')
+    print load_collection_sentences(Starbucks_root)
 
 if __name__ == "__main__":
     main()
