@@ -60,7 +60,8 @@ def get_tf(path):
        else:
            map[token] = 1
     for token in map.keys():
-        map[token] /= len(tokens)
+        pass
+        map[token] /= float(len(tokens))
     return map
 
 def main():
