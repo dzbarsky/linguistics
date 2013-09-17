@@ -1,0 +1,2 @@
+Illumina Begins Shipment of BeadStation 500G Benchtop Genotyping System.
+Illumina Inc. announced that it has begun shipping the BeadStation 500G, a new system for performing DNA analysis using Illumina's proven SNP genotyping technology. The benchtop system complements Illumina's production-scale BeadLab and is designed for individual research groups and core labs that have throughput requirements ranging from 6,000 to 300,000 genotypes per day.

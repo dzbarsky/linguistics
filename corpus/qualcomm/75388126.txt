@@ -1,0 +1,2 @@
+Atheros Communications Inc.'s ROCm(r) Technology Rocks Wireless in Microsoft's New Zune HD Portable Media Player.
+Atheros Communications Inc. announced that Microsoft's new Zune HD media player leverages the performance and power efficiency of the Mobile WLAN chip, Atheros' Radio-on-Chip for Mobile (ROCm), to deliver a great wireless experience. Consumers can seamlessly stream music directly from Zune Marketplace using their Zune Pass(1) via Wi-Fi, surf the web and enjoy rapid synching between a PC and a Zune HD.

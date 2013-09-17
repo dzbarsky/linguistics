@@ -1,0 +1,2 @@
+PCTEL and Atheros Communications Announce License Agreement for PCTEL's SoftAP Technology.
+PCTEL Inc. and Atheros Communications Inc. announced a licensing agreement whereby Atheros will offer PCTEL's Soft Access Point software solution for use with products that include Atheros' high-performance WLAN chipsets. Availability for Atheros' SoftAP-enabled products is expected in Q1 2005. PCTEL's SoftAP software will quickly convert a PC using an Atheros based network interface card into a fully functional access point (AP) with routing and firewall capabilities.

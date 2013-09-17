@@ -1,0 +1,2 @@
+Molex KiloLambda Announce New Optical Fuse Line.
+Molex Incorporated announced the availability of an innovative new product to protect optically amplified systems and networks. The optical fuse is a component that can be placed in any fiber optic system that is optically amplified to protect expensive equipment and the fiber cable itself from damaging power spikes and surges. Its passive operation causes an immediate drop in signal level when the transmitted optical power exceeds the fuse's pre-set power rating.

@@ -1,0 +1,2 @@
+Illumina introduces RefSet Oligos for Human Genome.
+Illumina Inc. has announced the introduction of RefSet Oligos for the Human Genome, a new whole-genome oligo reference set designed and optimized for spotted gene expression microarrays. The new oligo set was developed in collaboration with academic researchers to establish rigorous criteria for gene selection and probe design, and to conduct sensitivity and target specificity performance testing of the finished product.
