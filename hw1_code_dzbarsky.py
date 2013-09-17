@@ -7,6 +7,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 Corpus_root = 'corpus'
 Mixed_root = 'mixed'
 Starbucks_root = 'corpus/starbucks'
+Heinz_root = 'corpus/heinz'
 
 def get_sub_directories(directory):
     subdirs = set()
@@ -47,6 +48,21 @@ def load_collection_tokens(directory):
         tokens.extend(load_file_tokens(directory + '/' + file))
     return tokens
 
+def get_tf(path):
+    map = dict()
+    if path.find('/') >= 0:
+        tokens = load_collection_tokens(path)
+    else:
+        tokens = load_file_tokens(path)
+    for token in tokens:
+       if token in map:
+           map[token] += 1
+       else:
+           map[token] = 1
+    for token in map.keys():
+        map[token] /= len(tokens)
+    return map
+
 def main():
     print get_sub_directories(Corpus_root)
     print get_all_files(Starbucks_root)
@@ -54,6 +70,7 @@ def main():
     print load_collection_sentences(Starbucks_root)
     print load_file_tokens(Starbucks_root + '/118990300.txt')
     print load_collection_tokens(Starbucks_root)
+    print get_tf(Heinz_root)
 
 if __name__ == "__main__":
     main()
