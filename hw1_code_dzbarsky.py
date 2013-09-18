@@ -51,13 +51,12 @@ def get_tf(path):
     else:
         tokens = load_file_tokens(path)
 
-    count = 1.0/len(tokens)
     map = dict()
     for token in tokens:
        if token in map:
-           map[token] += count
+           map[token] += 1
        else:
-           map[token] = count
+           map[token] = 1
     return map
 
 def get_idf(directory):
@@ -147,15 +146,16 @@ def main():
     #print load_collection_sentences(Starbucks_root)
     #print load_file_tokens(Starbucks_root + '/118990300.txt')
     #print load_collection_tokens(Starbucks_root)
-    #dict1 = get_tf(Heinz_root)
+    dict1 = get_tf(Heinz_root)
+    print dict1
     #dict2 = get_idf(Corpus_root)
     #print get_tf_idf_words(dict1, dict2, 10)
-    print get_mi(Starbucks_root, 'starbucks')
-    sentences = ["this is a test", "this is another test"]
-    print create_feature_space(sentences)
-    feature_space = create_feature_space(sentences)
-    print vectorize(feature_space, "another test")
-    print cosine_similarity([1,1,0,1], [2,0,1,1])
+    #print get_mi(Starbucks_root, 'starbucks')
+    #sentences = ["this is a test", "this is another test"]
+    #print create_feature_space(sentences)
+    #feature_space = create_feature_space(sentences)
+    #print vectorize(feature_space, "another test")
+    #print cosine_similarity([1,1,0,1], [2,0,1,1])
 
 
 if __name__ == "__main__":
