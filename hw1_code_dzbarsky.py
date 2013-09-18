@@ -109,6 +109,37 @@ def get_mi(directory, w):
 def get_mi_words(directory, k):
     pass
 
+def create_feature_space(list):
+    map = dict()
+    counter = 0
+    for sentence in list:
+        for token in word_tokenize(sentence):
+            if not token in map:
+                map[token] = counter
+                counter += 1
+    return map
+
+def vectorize(feature_space, str):
+    vector = []
+    for i in feature_space.keys():
+        vector.append(0)
+
+    for token in set(word_tokenize(str)):
+        vector[feature_space[token]] = 1
+
+    return vector
+
+def cosine_similarity(X, Y):
+    numerator = 0.0
+    Xsum = 0
+    Ysum = 0
+    for i in range(len(X)):
+        numerator += X[i] * Y[i]
+        Xsum += X[i] * X[i]
+        Ysum += Y[i] * Y[i]
+
+    return numerator/(math.sqrt(Xsum) * math.sqrt(Ysum))
+
 def main():
     #print get_sub_directories(Corpus_root)
     #print get_all_files(Corpus_root)
@@ -120,6 +151,11 @@ def main():
     #dict2 = get_idf(Corpus_root)
     #print get_tf_idf_words(dict1, dict2, 10)
     print get_mi(Starbucks_root, 'starbucks')
+    sentences = ["this is a test", "this is another test"]
+    print create_feature_space(sentences)
+    feature_space = create_feature_space(sentences)
+    print vectorize(feature_space, "another test")
+    print cosine_similarity([1,1,0,1], [2,0,1,1])
 
 
 if __name__ == "__main__":
