@@ -129,11 +129,11 @@ def vectorize(feature_space, str):
     return vector
 
 def get_precision(L_1, k, L_2):
-    L1_k = get_mi_words()
+    L1_k = L1[:k]
     return len(L1_k.intersect(L_2))/float(len(L1_k))
 
 def get_recall(L_1, k, L_2):
-    L1_k = get_mi_words()
+    L1_k = L1[:k]
     return len(L1_k.intersect(L_2))/float(len(L_2))
 
 def get_fmeasure(L_1, k, L_2):
