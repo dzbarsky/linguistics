@@ -90,23 +90,42 @@ def get_tf_idf_words(dict1, dict2, k):
         terms.append(item[0])
     return terms
 
-def get_mi(directory, w):
-    dir_tokens = load_collection_tokens(directory)
+def get_words_freq(directory):
+    map = dict()
+    tokens = load_collection_tokens(directory)
+    for token in tokens:
+        if token in map:
+            map[token] += 1
+        else:
+            map[token] = 1.0
+    return map
+
+def compute_mi(w, dir_map, corpus_map):
     num = 0.0
-    for token in dir_tokens:
-        if token == w:
-            num += 1
-    num /= len(dir_tokens)
     denom = 0.0
-    cor_tokens = load_collection_tokens('corpus')
-    for token in cor_tokens:
-        if token == w:
-            denom += 1
-    denom /= len(cor_tokens)
-    return math.log((num/denom))
-    
+    num = dir_map[w]/sum(dir_map.values())
+    denom = corpus_map[w]/sum(corpus_map.values())
+    return math.log(num/denom)
+
+def get_mi(directory, w):
+    dir_map = get_words_freq(directory)
+    corpus_map = get_words_freq('corpus')
+    return compute_mi(w, dir_map, corpus_map)
+
 def get_mi_words(directory, k):
-    pass
+    corpus_map = get_words_freq('corpus')
+    dir_map = get_words_freq(directory)
+    for token in corpus_map.keys():
+        if corpus_map[token] < 5:
+            del corpus_map[token]
+            if token in dir_map:
+                del dir_map[token]
+    freq_map = dict()
+    for token in dir_map.keys():
+        freq_map[token] = compute_mi(token, dir_map, corpus_map)
+    tokens = freq_map.keys()
+    tokens.sort(key=freq_map.__getitem__, reverse=True)
+    return tokens[:k-1]
 
 def create_feature_space(list):
     map = dict()
@@ -146,11 +165,11 @@ def main():
     #print load_collection_sentences(Starbucks_root)
     #print load_file_tokens(Starbucks_root + '/118990300.txt')
     #print load_collection_tokens(Starbucks_root)
-    dict1 = get_tf(Heinz_root)
-    print dict1
+    #dict1 = get_tf(Heinz_root)
+    #print dict1
     #dict2 = get_idf(Corpus_root)
     #print get_tf_idf_words(dict1, dict2, 10)
-    #print get_mi(Starbucks_root, 'starbucks')
+    print get_mi_words(Starbucks_root, 10)
     #sentences = ["this is a test", "this is another test"]
     #print create_feature_space(sentences)
     #feature_space = create_feature_space(sentences)
