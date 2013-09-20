@@ -82,7 +82,7 @@ def get_idf(directory):
 
     return map
 
-def get_tf_idf_words(dict1, dict2, k):
+def get_tfidf_words(dict1, dict2, k):
     tuples = []
     for term in dict1:
         tuples.append((term, dict1[term] * dict2[term]))
@@ -209,7 +209,7 @@ def get_doc_tfidf_vector(path, W):
 def get_tfidf_simdocs(ref_path, k):
     dict1 = get_tf(ref_path)
     dict2 = get_idf(Corpus_root)
-    W = get_tf_idf_words(dict1, dict2, k)
+    W = get_tfidf_words(dict1, dict2, k)
     corp = get_doc_tfidf_vector(ref_path, W)
     testFiles = get_all_files(Mixed_root)
     doc_vectors = dict()
@@ -266,8 +266,71 @@ def get_common_contexts(word1, word2, directory):
     context2 = get_word_contexts(word2, directory)
     return list(set(context1) & set(context2))
 
+def feature_space_helper(list):
+    map = dict()
+    counter = 0
+    for token in list:
+        if not token in map:
+            map[token] = counter
+            counter += 1
+    return map
+
+def vectorize_helper(feature_space, list):
+    vector = []
+    for i in feature_space.keys():
+        vector.append(0)
+
+    for token in set(list):
+        vector[feature_space[token]] = 1
+
+    return vector
+
 def compare_word_sim(path, k):
+    W = get_tfidf_words(get_tf(path), get_idf(Corpus_root), k)
+    contexts_list = []
+    contexts = []
+    for word in W:
+        con = get_word_contexts(word,path)
+        contexts_list.append(con)
+        contexts.extend(con)
+    feature_space = feature_space_helper(set(contexts))
+    word_vectors = []
+    for context in contexts_list:
+        word_vectors.append(vectorize_helper(feature_space, context))
+    matrix = []
+    for vector1 in word_vectors:
+        sim = []
+        for vector2 in word_vectors:
+            sim.append(cosine_similarity(vector1, vector2))
+        matrix.append(sim)
+    return matrix
+
+'''
+When printing compare_word_sim(Corpus_root + '/qualcomm', 10), we get:
+
+[[1.0, 0.23124864503144016, 0.18895099718933206, 0.1975029649151584, 0.17431926281167376, 0.1198271198752773, 0.2776795303967047, 0.042811734078171355, 0.19650294347725425, 0.19334007027804562], [0.23124864503144016, 1.0, 0.2136183479338211, 0.24253562503633294, 0.14002800840280097, 0.09378721544644802, 0.18069243800050583, 0.04356068418690321, 0.12065379433217112, 0.17705013195704256], [0.18895099718933206, 0.2136183479338211, 1.0, 0.40892939847550536, 0.24895967608079353, 0.1809381136270079, 0.2386133605551424, 0.029660839433408286, 0.2347262634065101, 0.2589698645587962], [0.1975029649151584, 0.24253562503633294, 0.40892939847550536, 1.0, 0.2680554821237548, 0.1381052127208091, 0.2515631714063358, 0.03207237536192409, 0.19289588622650466, 0.26650662042910983], [0.17431926281167376, 0.14002800840280097, 0.24895967608079353, 0.2680554821237548, 1.0, 0.46047009705340675, 0.2150670189265881, 0.02592379236826063, 0.15044515564140667, 0.1717073987899772], [0.1198271198752773, 0.09378721544644802, 0.1809381136270079, 0.1381052127208091, 0.46047009705340675, 1.0, 0.1702367079689875, 0.013022324932151278, 0.15801683252692647, 0.08625395191157326], [0.2776795303967047, 0.18069243800050583, 0.2386133605551424, 0.2515631714063358, 0.2150670189265881, 0.1702367079689875, 0.9999999999999999, 0.042575420953522417, 0.24066290927412823, 0.23072744115175065], [0.042811734078171355, 0.04356068418690321, 0.029660839433408286, 0.03207237536192409, 0.02592379236826063, 0.013022324932151278, 0.042575420953522417, 1.0, 0.0063819965088956964, 0.05098769784045568], [0.19650294347725425, 0.12065379433217112, 0.2347262634065101, 0.19289588622650466, 0.15044515564140667, 0.15801683252692647, 0.24066290927412823, 0.0063819965088956964, 1.0, 0.12681431837544702], [0.19334007027804562, 0.17705013195704256, 0.2589698645587962, 0.26650662042910983, 0.1717073987899772, 0.08625395191157326, 0.23072744115175065, 0.05098769784045568, 0.12681431837544702, 0.9999999999999998]]
+
+'''
+
+def get_similar_pairs(k, N):
+    W = get_tfidf_words(get_tf(Starbucks_root), get_idf(Corpus_root), k)
+    matrix = compare_word_sim(Starbucks_root, k)
+    map = dict()
+    for i in range(len(matrix)):
+        for j in range(i):
+            map[W[i] + '_' + W[j]] = matrix[i][j]
+
+    l = []
+    for w in sorted(map, key=map.get, reverse=True):
+        l.append((w, map[w]))
+    return l[:N]
     
+'''
+When printing get_similar_pairs(30, 10), we get:
+
+[('million_$', 0.6614801056400267), ('%_percent', 0.5501485601695769), ('same_period', 0.5012804118276031), ('corporation_corp.', 0.46861058735073596), ('net_consolidated', 0.3818813079129867), ('earnings_revenues', 0.36666666666666664), ('earnings_consolidated', 0.35856858280031806), ('earnings_sales', 0.3261640365267211), ('sales_revenues', 0.3261640365267211), ('company_corp.', 0.3203704199628461)]
+
+'''
 
 def main():
     #print get_sub_directories(Corpus_root)
@@ -276,10 +339,9 @@ def main():
     #print load_collection_sentences(Starbucks_root)
     #print load_file_tokens(Starbucks_root + '/118990300.txt')
     #print load_collection_tokens(Starbucks_root)
-    #dict1 = get_tf(Heinz_root)
-    #print dict1
+    #dict1 = get_tf(Starbucks_root)
     #dict2 = get_idf(Corpus_root)
-    #print get_tf_idf_words(dict1, dict2, 10)
+    #print get_tfidf_words(dict1, dict2, 30)
     #print get_mi_words(Starbucks_root, 10)
     #sentences = ["this is a test", "this is another test"]
     #print create_feature_space(sentences)
@@ -288,7 +350,10 @@ def main():
     #print cosine_similarity([1,1,0,1], [2,0,1,1])
     #print get_tfidf_simdocs(Starbucks_root, 10)
     #print get_mi_simdocs(Starbucks_root, 10)
-    print get_common_contexts('sales', 'earnings', Starbucks_root)
+    #print get_common_contexts('sales', 'earnings', Starbucks_root)
+    #print compare_word_sim(Starbucks_root, 10)
+    #print compare_word_sim(Corpus_root + '/qualcomm', 10)
+    print get_similar_pairs(30, 10)
 
 if __name__ == "__main__":
     main()
