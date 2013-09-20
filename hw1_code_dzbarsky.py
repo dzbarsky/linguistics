@@ -106,11 +106,11 @@ def compute_mi(w, dir_map, corpus_map):
 
 def get_mi(directory, w):
     dir_map = get_words_freq(directory)
-    corpus_map = get_words_freq('corpus')
+    corpus_map = get_words_freq(Corpus_root)
     return compute_mi(w, dir_map, corpus_map)
 
 def get_mi_words(directory, k):
-    corpus_map = get_words_freq('corpus')
+    corpus_map = get_words_freq(Corpus_root)
     dir_map = get_words_freq(directory)
     for token in corpus_map.keys():
         if corpus_map[token] < 5:
