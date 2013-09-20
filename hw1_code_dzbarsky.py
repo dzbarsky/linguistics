@@ -127,6 +127,19 @@ def get_mi_words(directory, k):
     tokens.sort(key=freq_map.__getitem__, reverse=True)
     return tokens[:k-1]
 
+def get_precision(L_1, k, L_2):
+    L1_k = L1[:k]
+    return len(L1_k.intersect(L_2))/float(len(L1_k))
+
+def get_recall(L_1, k, L_2):
+    L1_k = L1[:k]
+    return len(L1_k.intersect(L_2))/float(len(L_2))
+
+def get_fmeasure(L_1, k, L_2):
+    precision = get_precision(L_1, k, L_2)
+    recall = get_recall(L_1, k, L_2)
+    return 2 * precision * recall / (precision + recall)
+
 def create_feature_space(list):
     map = dict()
     counter = 0
@@ -146,19 +159,6 @@ def vectorize(feature_space, str):
         vector[feature_space[token]] = 1
 
     return vector
-
-def get_precision(L_1, k, L_2):
-    L1_k = L1[:k]
-    return len(L1_k.intersect(L_2))/float(len(L1_k))
-
-def get_recall(L_1, k, L_2):
-    L1_k = L1[:k]
-    return len(L1_k.intersect(L_2))/float(len(L_2))
-
-def get_fmeasure(L_1, k, L_2):
-    precision = get_precision(L_1, k, L_2)
-    recall = get_recall(L_1, k, L_2)
-    return 2 * precision * recall / (precision + recall)
 
 def cosine_similarity(X, Y):
     numerator = 0.0
