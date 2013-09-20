@@ -19,7 +19,12 @@ def get_sub_directories(directory):
     return list(subdirs)
 
 def get_all_files(directory):
-    return PlaintextCorpusReader(directory, '.*').fileids()
+    # We assume that a filename with a . is always a file rather than a directory
+    # IF we were passed a file, just return that file.  This simplifies representing documents because they need to handle single files.
+    if directory.find('.') < 0:
+        return PlaintextCorpusReader(directory, '.*').fileids()
+    #if directory is a file return the file in a list
+    return [directory]
 
 def load_file_sentences(filepath):
     index = filepath.rfind('/')
@@ -46,7 +51,7 @@ def load_collection_tokens(directory):
     return tokens
 
 def get_tf(path):
-    if path.find('.txt') >= 0:
+    if path.find('.') >= 0:
         tokens = load_file_tokens(path)
     else:
         tokens = load_collection_tokens(path)
@@ -165,30 +170,108 @@ def cosine_similarity(X, Y):
         numerator += X[i] * Y[i]
         Xsum += X[i] * X[i]
         Ysum += Y[i] * Y[i]
-
+    if Xsum is 0 or Ysum is 0:
+        return -1
     return numerator/(math.sqrt(Xsum) * math.sqrt(Ysum))
 
 def get_doc_binary_vector(path, W):
-    if path.find('.txt') >= 0:
-        files=[path]
+    if path.find('.') < 0:
+        fileText = load_collection_tokens(path)
     else:
-        files = get_all_files(path)
+        fileText = load_file_tokens(path)
+    vector = []
+    for word in W:
+        if word in fileText:
+            vector.append(1)
+        else:
+            vector.append(0)
+    return vector
 
-    vectors = []
-    for file in files:
-        fileText = load_file_tokens(file)
-        vector = []
-        for word in W:
-            if word in fileText:
-                vector.append(1)
-            else:
-                vector.append(0)
+def get_tfidf_vector_helper(tf_map, idf_map, fileText, W):
+    vector = []
+    for word in W:
+        if word in fileText:
+            vector.append(tf_map[word]*idf_map[word])
+        else:
+            vector.append(0)
+    return vector
 
-        vector.append(vector)
+def get_doc_tfidf_vector(path, W):
+    tf_map = get_tf(path)
+    idf_map = get_idf(Corpus_root)
+    if path.find('.') < 0:
+        fileText = load_collection_tokens(path)
+    else:
+        fileText = load_file_tokens(path)
+    vector = get_tfidf_vector_helper(tf_map, idf_map, fileText, W)
+    return vector
+
+def get_tfidf_simdocs(ref_path, k):
+    dict1 = get_tf(ref_path)
+    dict2 = get_idf(Corpus_root)
+    W = get_tf_idf_words(dict1, dict2, k)
+    corp = get_doc_tfidf_vector(ref_path, W)
+    testFiles = get_all_files(Mixed_root)
+    doc_vectors = dict()
+    for file in testFiles:
+        fileText = load_file_tokens(Mixed_root + '/' + file)
+        vector = get_tfidf_vector_helper(dict1, dict2, fileText, W)
+        doc_vectors[file] = vector
+    similarity = []
+    for file in testFiles:
+        similarity.append((file, cosine_similarity(doc_vectors[file], corp)))
+    list.sort(similarity, key= lambda x: x[1], reverse=True)
+    return similarity[:100]
+
+def get_mi_simdocs(ref_path, k):
+    corpus_map = get_words_freq('corpus')
+    dir_map = get_words_freq(ref_path)
+    W = get_mi_words(ref_path, k)
+    corp = get_doc_binary_vector(ref_path, W)
+    i = 0
+    for word in W:
+        corp[i] = corp[i]*compute_mi(word, dir_map, corpus_map)
+        i += 1
+    testFiles = get_all_files(Mixed_root)
+    doc_vectors = dict()
+    for file in testFiles:
+        fileText = load_file_tokens(Mixed_root + '/' + file)
+        vector = get_doc_binary_vector(Mixed_root + '/' + file, W)
+        doc_vectors[file] = vector
+    sim = []
+    for file in testFiles:
+        sim.append((file, cosine_similarity(doc_vectors[file], corp)))
+    list.sort(sim, key= lambda x: x[1], reverse=True)
+    return sim[:100]
+'''
+ We see for fixed path = Starbucks_root and a fixed k = 10, the tf_idf model works
+ better and finds more relevant results (all the starbucks###.txt are at the top whereas
+ in the MI approach there is a heinz###.txt). We like the tf_idf approach better because
+ it stores actual values in the vectors whereas the MI method only has binary vectors
+ (which leads to many files with the same cosine similarity). We also think that the
+ tf_idf has more information with regards to the weightings of each word.
+'''
+
+def get_word_contexts(word, directory):
+    context = []
+    tokens = load_collection_tokens(directory)
+    for i in range(len(tokens)):
+	if tokens[i] == word:
+	    context.append(tokens[i-1])
+	    context.append(tokens[i+1])
+    return list(set(context))
+
+def get_common_contexts(word1, word2, directory):
+    context1 = get_word_contexts(word1, directory)
+    context2 = get_word_contexts(word2, directory)
+    return list(set(context1) & set(context2))
+
+def compare_word_sim(path, k):
+    
 
 def main():
     #print get_sub_directories(Corpus_root)
-    #print get_all_files(Corpus_root)
+    #print get_all_files(Starbucks_root + '/118990300.txt')
     #print load_file_sentences(Starbucks_root + '/118990300.txt')
     #print load_collection_sentences(Starbucks_root)
     #print load_file_tokens(Starbucks_root + '/118990300.txt')
@@ -197,13 +280,15 @@ def main():
     #print dict1
     #dict2 = get_idf(Corpus_root)
     #print get_tf_idf_words(dict1, dict2, 10)
-    print get_mi_words(Starbucks_root, 10)
+    #print get_mi_words(Starbucks_root, 10)
     #sentences = ["this is a test", "this is another test"]
     #print create_feature_space(sentences)
     #feature_space = create_feature_space(sentences)
     #print vectorize(feature_space, "another test")
     #print cosine_similarity([1,1,0,1], [2,0,1,1])
-
+    #print get_tfidf_simdocs(Starbucks_root, 10)
+    #print get_mi_simdocs(Starbucks_root, 10)
+    print get_common_contexts('sales', 'earnings', Starbucks_root)
 
 if __name__ == "__main__":
     main()
