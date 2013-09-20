@@ -169,7 +169,22 @@ def cosine_similarity(X, Y):
     return numerator/(math.sqrt(Xsum) * math.sqrt(Ysum))
 
 def get_doc_binary_vector(path, W):
-    pass
+    if path.find('.txt') >= 0:
+        files=[path]
+    else:
+        files = get_all_files(path)
+
+    vectors = []
+    for file in files:
+        fileText = load_file_tokens(file)
+        vector = []
+        for word in W:
+            if word in fileText:
+                vector.append(1)
+            else:
+                vector.append(0)
+
+        vector.append(vector)
 
 def main():
     #print get_sub_directories(Corpus_root)
