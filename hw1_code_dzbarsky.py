@@ -46,10 +46,10 @@ def load_collection_tokens(directory):
     return tokens
 
 def get_tf(path):
-    if path.find('/') >= 0:
-        tokens = load_collection_tokens(path)
-    else:
+    if path.find('.txt') >= 0:
         tokens = load_file_tokens(path)
+    else:
+        tokens = load_collection_tokens(path)
 
     map = dict()
     for token in tokens:
@@ -72,7 +72,6 @@ def get_idf(directory):
                 map[token] += 1
             else:
                 map[token] = 1.0
-
     for token in map.keys():
         map[token] = math.log(len(files)/map[token])
 
@@ -101,8 +100,6 @@ def get_words_freq(directory):
     return map
 
 def compute_mi(w, dir_map, corpus_map):
-    num = 0.0
-    denom = 0.0
     num = dir_map[w]/sum(dir_map.values())
     denom = corpus_map[w]/sum(corpus_map.values())
     return math.log(num/denom)
@@ -170,6 +167,9 @@ def cosine_similarity(X, Y):
         Ysum += Y[i] * Y[i]
 
     return numerator/(math.sqrt(Xsum) * math.sqrt(Ysum))
+
+def get_doc_binary_vector(path, W):
+    pass
 
 def main():
     #print get_sub_directories(Corpus_root)
