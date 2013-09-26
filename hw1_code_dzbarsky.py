@@ -12,6 +12,8 @@ Heinz_root = 'corpus/heinz'
 
 def get_sub_directories(directory):
     subdirs = set()
+    # Find al the files and parse out the directory up to the /, those are the
+    # subdirectories.
     for file in PlaintextCorpusReader(directory, '.*').fileids():
         index = file.find('/')
         if index > 0:
@@ -51,6 +53,8 @@ def load_collection_tokens(directory):
     return tokens
 
 def get_tf(path):
+    # If this is a single file, load the tokens.  Otherwise, load all tokens
+    # for the collection.
     if path.find('.') >= 0:
         tokens = load_file_tokens(path)
     else:
@@ -84,6 +88,7 @@ def get_idf(directory):
 
 def get_tfidf_words(dict1, dict2, k):
     tuples = []
+    # Compute tf-idf as tf*idf
     for term in dict1:
         tuples.append((term, dict1[term] * dict2[term]))
 
@@ -146,6 +151,7 @@ def create_feature_space(list):
     map = dict()
     counter = 0
     for sentence in list:
+        # Tokenize the words because we want to ignore the punctuation.
         for token in word_tokenize(sentence):
             if not token in map:
                 map[token] = counter
@@ -256,9 +262,9 @@ def get_word_contexts(word, directory):
     context = []
     tokens = load_collection_tokens(directory)
     for i in range(len(tokens)):
-	if tokens[i] == word:
-	    context.append(tokens[i-1])
-	    context.append(tokens[i+1])
+    if tokens[i] == word:
+        context.append(tokens[i-1])
+        context.append(tokens[i+1])
     return list(set(context))
 
 def get_common_contexts(word1, word2, directory):
@@ -324,7 +330,7 @@ def get_similar_pairs(k, N):
     for w in sorted(map, key=map.get, reverse=True):
         l.append((w, map[w]))
     return l[:N]
-    
+
 '''
 When printing get_similar_pairs(30, 10), we get:
 
