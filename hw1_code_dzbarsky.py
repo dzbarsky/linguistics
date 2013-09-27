@@ -181,8 +181,10 @@ def cosine_similarity(X, Y):
     return numerator/(math.sqrt(Xsum) * math.sqrt(Ysum))
 
 def get_doc_binary_vector(path, W):
+    #if there is a '.', then the path is a file
     if path.find('.') < 0:
         fileText = load_collection_tokens(path)
+    #else it's a directory
     else:
         fileText = load_file_tokens(path)
     vector = []
@@ -193,6 +195,8 @@ def get_doc_binary_vector(path, W):
             vector.append(0)
     return vector
 
+#helper takes the tf and idf frequencies and returns a vector
+#with each word's value as tf*idf
 def get_tfidf_vector_helper(tf_map, idf_map, fileText, W):
     vector = []
     for word in W:
@@ -204,7 +208,7 @@ def get_tfidf_vector_helper(tf_map, idf_map, fileText, W):
 
 def get_doc_tfidf_vector(path, W):
     tf_map = get_tf(path)
-    idf_map = get_idf(Corpus_root)
+    idf_map = get_idf(Corpus_root)  #computes idf from Corpus by default
     if path.find('.') < 0:
         fileText = load_collection_tokens(path)
     else:
@@ -214,20 +218,20 @@ def get_doc_tfidf_vector(path, W):
 
 def get_tfidf_simdocs(ref_path, k):
     dict1 = get_tf(ref_path)
-    dict2 = get_idf(Corpus_root)
+    dict2 = get_idf(Corpus_root)  #computes idf from corpus by default
     W = get_tfidf_words(dict1, dict2, k)
     corp = get_doc_tfidf_vector(ref_path, W)
     testFiles = get_all_files(Mixed_root)
     doc_vectors = dict()
     for file in testFiles:
-        fileText = load_file_tokens(Mixed_root + '/' + file)
+        fileText = load_file_tokens(Mixed_root + '/' + file)  #all the files from mixed folder
         vector = get_tfidf_vector_helper(dict1, dict2, fileText, W)
         doc_vectors[file] = vector
     similarity = []
     for file in testFiles:
         similarity.append((file, cosine_similarity(doc_vectors[file], corp)))
     list.sort(similarity, key= lambda x: x[1], reverse=True)
-    return similarity[:100]
+        return similarity[:100]  #top 100 similar documents in mixed folder using tfidf
 
 def get_mi_simdocs(ref_path, k):
     corpus_map = get_words_freq('corpus')
@@ -241,7 +245,7 @@ def get_mi_simdocs(ref_path, k):
     testFiles = get_all_files(Mixed_root)
     doc_vectors = dict()
     for file in testFiles:
-        fileText = load_file_tokens(Mixed_root + '/' + file)
+        fileText = load_file_tokens(Mixed_root + '/' + file)  #all the files from mixed folder
         vector = get_doc_binary_vector(Mixed_root + '/' + file, W)
         doc_vectors[file] = vector
     sim = []
@@ -262,9 +266,10 @@ def get_word_contexts(word, directory):
     context = []
     tokens = load_collection_tokens(directory)
     for i in range(len(tokens)):
-    if tokens[i] == word:
-        context.append(tokens[i-1])
-        context.append(tokens[i+1])
+        if tokens[i] == word:
+            #word context being one word before and one word after
+            context.append(tokens[i-1])
+            context.append(tokens[i+1])
     return list(set(context))
 
 def get_common_contexts(word1, word2, directory):
@@ -339,6 +344,7 @@ When printing get_similar_pairs(30, 10), we get:
 '''
 
 def main():
+    #below are some of the tests we ran
     #print get_sub_directories(Corpus_root)
     #print get_all_files(Starbucks_root + '/118990300.txt')
     #print load_file_sentences(Starbucks_root + '/118990300.txt')
@@ -359,7 +365,7 @@ def main():
     #print get_common_contexts('sales', 'earnings', Starbucks_root)
     #print compare_word_sim(Starbucks_root, 10)
     #print compare_word_sim(Corpus_root + '/qualcomm', 10)
-    print get_similar_pairs(30, 10)
+    #print get_similar_pairs(30, 10)
 
 if __name__ == "__main__":
     main()
