@@ -231,8 +231,8 @@ def get_tfidf_simdocs(ref_path, k):
     for file in testFiles:
         similarity.append((file, cosine_similarity(doc_vectors[file], corp)))
     list.sort(similarity, key= lambda x: x[1], reverse=True)
-        return similarity[:100]  #top 100 similar documents in mixed folder using tfidf
-
+    return similarity[:100]
+    
 def get_mi_simdocs(ref_path, k):
     corpus_map = get_words_freq('corpus')
     dir_map = get_words_freq(ref_path)
@@ -351,11 +351,11 @@ def main():
     #print load_collection_sentences(Starbucks_root)
     #print load_file_tokens(Starbucks_root + '/118990300.txt')
     #print load_collection_tokens(Starbucks_root)
-    #dict1 = get_tf(Starbucks_root)
+    #dict1 = get_tf(Heinz_root)
     #dict2 = get_idf(Corpus_root)
-    #print get_tfidf_words(dict1, dict2, 30)
+    #print get_tfidf_words(dict1, dict2, 10)
     #print get_mi_words(Starbucks_root, 10)
-    #sentences = ["this is a test", "this is another test"]
+    sentences = ["this is a test", "this is another test"]
     #print create_feature_space(sentences)
     #feature_space = create_feature_space(sentences)
     #print vectorize(feature_space, "another test")
